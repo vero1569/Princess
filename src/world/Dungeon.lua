@@ -13,8 +13,10 @@ Dungeon = Class{}
 
 function Dungeon:init(player)
     self.player = player
+   
     -- current room we're operating in
     self.currentRoom = Room(self.player)
+    self.bossRoomGenerated = false
 
     -- room we're moving camera to during a shift; becomes active room afterwards
     self.nextRoom = nil
@@ -48,7 +50,31 @@ end
 ]]
 function Dungeon:beginShifting(shiftX, shiftY)
     self.shifting = true
-    self.nextRoom = Room(self.player)
+    local isBossRoom = false
+
+    local entranceDirection = 'top'  
+
+    if shiftX > 0 then
+        entranceDirection = 'right'
+    elseif shiftX < 0 then
+        entranceDirection = 'left'
+    elseif shiftY > 0 then
+        entranceDirection = 'down'
+    elseif shiftY < 0 then
+        entranceDirection = 'top'
+    end
+
+    if self.player.hasBow and not self.bossRoomGenerated then
+                
+        isBossRoom = math.random(4) == 1
+        if isBossRoom then
+            self.bossRoomGenerated = true
+        end
+    end
+
+
+    self.nextRoom = Room(self.player,isBossRoom,entranceDirection)
+    
 
     -- start all doors in next room as open until we get in
     for k, doorway in pairs(self.nextRoom.doorways) do

@@ -27,7 +27,7 @@ function Player:collides(target)
 end
 
 function Player:render()
-     --dibuja el sprite del jugador desde este render 
+    Entity.render(self)
     local anim = self.currentAnimation
     love.graphics.draw(
         TEXTURES[anim.texture],

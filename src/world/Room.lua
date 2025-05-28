@@ -11,9 +11,12 @@
 ]]
 Room = Class{}
 
-function Room:init(player)
+function Room:init(player,isBossRoom, entranceDirection)
     -- reference to player for collisions, etc.
     self.player = player
+    self.isBossRoom = isBossRoom or false 
+    self. entranceDirection =  entranceDirection
+
 
     self.width = MAP_WIDTH
     self.height = MAP_HEIGHT
@@ -31,10 +34,7 @@ function Room:init(player)
 
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
-    table.insert(self.doorways, Doorway('top', false, self))
-    table.insert(self.doorways, Doorway('bottom', false, self))
-    table.insert(self.doorways, Doorway('left', false, self))
-    table.insert(self.doorways, Doorway('right', false, self))
+    self:generateDoorways()
 
     -- used for centering the dungeon rendering
     self.renderOffsetX = MAP_RENDER_OFFSET_X
@@ -60,6 +60,11 @@ function Room:update(dt)
         -- remove entity from the table if health is <= 0
         if entity.health <= 0 then
             entity.dead = true
+
+            if entity.isBoss then
+                stateMachine:change('winner')
+                return
+            end
             -- chance to drop a heart
             if not entity.dropped and math.random(10) == 1 then
                 table.insert(self.objects, GameObject(GAME_OBJECT_DEFS['heart'], entity.x, entity.y))
@@ -93,7 +98,7 @@ function Room:update(dt)
             local objCol = math.floor(objectCenterX / TILE_SIZE)
             local objRow = math.floor(objectCenterY / TILE_SIZE)
 
-            -- abre si esta al lado y alineado
+          
             if (player.direction == 'right' and playerRow == objRow and objCol == playerCol + 1) or
             (player.direction == 'left' and playerRow == objRow and objCol == playerCol - 1) or
             (player.direction == 'up' and playerCol == objCol and objRow == playerRow - 1) or
@@ -101,7 +106,7 @@ function Room:update(dt)
                 object.state = 'open'
                 object.frame = object.states['open'].frame
 
-                --solo genera el arco si no existe ya uno en la sala
+          
                 local bowExists = false
                 for _, obj in pairs(self.objects) do
                     if obj.type == 'bow' then
@@ -122,7 +127,7 @@ function Room:update(dt)
                 end
             end
 
-            --recoge el arco
+          
             if object.type == 'bow' and not self.player.hasBow and self.player:collides(object) then
                 if object.onConsume then
                     object.onConsume(self.player, object)
@@ -133,7 +138,6 @@ function Room:update(dt)
         end
 
 
-        --limpia objetos tomados
         for i = #self.objects, 1, -1 do
             if self.objects[i].taken then
                 table.remove(self.objects, i)
@@ -146,13 +150,25 @@ function Room:update(dt)
 
         -- collision between the player and entities in the room
         if not entity.dead and self.player:collides(entity) and not self.player.invulnerable then
-            SOUNDS['hit-player']:play()
-            self.player:damage(1)
-            self.player:goInvulnerable(1.5)
+            if entity.isBoss then
+                SOUNDS['hit-player']:play()
+                self.player:damage(2)
+                self.player:goInvulnerable(1.5)
 
-            if self.player.health == 0 then
+                if self.player.health == 0 then
                 stateMachine:change('game-over')
+                end
+
+            else
+                SOUNDS['hit-player']:play()
+                self.player:damage(1)
+                self.player:goInvulnerable(1.5)
+
+                if self.player.health == 0 then
+                stateMachine:change('game-over')
+                end
             end
+
         end
     end
 
@@ -189,20 +205,37 @@ function Room:update(dt)
 
     for k, projectile in pairs(self.projectiles) do
         projectile:update(dt)
-
-        -- check collision with entities
-        for e, entity in pairs(self.entities) do
-            if projectile.dead then
-                break
-            end
-
-            if not entity.dead and projectile:collides(entity) then
-                entity:damage(1)
-                SOUNDS['hit-enemy']:play()
+    
+        -- Si el proyectil es una bola de fuego del jefe
+        if projectile.obj.type == 'fire' then
+            -- Solo colisiona con el jugador
+            if not projectile.dead and projectile:collides(self.player) then
+                self.player:damage(6)
+                SOUNDS['hit-player']:play()
                 projectile.dead = true
+
+                stateMachine:change('game-over')
+            end
+        else
+           -- Para otros proyectiles (flechas), colisionan con entidades
+            for e, entity in pairs(self.entities) do
+                if projectile.dead then
+                    break
+                end
+
+                if not entity.dead and projectile:collides(entity) then
+                    if entity.isBoss then
+                        -- Si es el jefe, hacerlo vulnerable a la espada
+                        entity.swordImmune = false
+                        entity.swordVulnerableTimer = 0
+                    end
+                    entity:damage(1)
+                    SOUNDS['hit-enemy']:play()
+                    projectile.dead = true
+                end
             end
         end
-
+    
         if projectile.dead then
             table.remove(self.projectiles, k)
         end
@@ -254,6 +287,28 @@ end
 ]]
 function Room:generateEntities()
     local types = {'skeleton', 'slime', 'bat', 'ghost', 'spider'}
+    if self.isBossRoom then
+         -- Generar el jefe en el centro de la sala
+         table.insert(self.entities, Entity {
+            animations = ENTITY_DEFS['boss'].animations,
+            walkSpeed = ENTITY_DEFS['boss'].walkSpeed,
+            x = VIRTUAL_WIDTH / 2 - 16,  -- Centrado horizontalmente
+            y = VIRTUAL_HEIGHT / 2 - 16,  -- Centrado verticalmente
+            width = 32,  -- Jefe más grande
+            height = 32,
+            health = 20, -- Más vida que enemigos normales
+            isBoss = true
+        })
+
+        self.entities[1].stateMachine = StateMachine {
+            ['walk'] = function() return EntityWalkState(self.entities[1],self) end,
+            ['idle'] = function() return EntityIdleState(self.entities[1]) end
+        }
+
+        self.entities[1]:changeState('walk')
+        return
+    end
+
 
     for i = 1, 10 do
         local type = types[math.random(#types)]
@@ -287,6 +342,11 @@ end
     Randomly creates an assortment of obstacles for the player to navigate around.
 ]]
 function Room:generateObjects()
+
+    if self.isBossRoom then
+        return
+    end
+
     table.insert(self.objects, GameObject(
         GAME_OBJECT_DEFS['switch'],
         math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
@@ -294,9 +354,12 @@ function Room:generateObjects()
         math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
                     VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
     ))
+    
 
     -- get a reference to the switch
     local switch = self.objects[1]
+   
+    
 
     --define a function for the switch that will open all doors in the room
     switch.onCollide = function()
@@ -312,6 +375,8 @@ function Room:generateObjects()
         end
     end
 
+
+    
      --agrega un cofre aleatoriamnete
     local chestX = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE, VIRTUAL_WIDTH - TILE_SIZE * 2 - 32)
     local minChestY = MAP_RENDER_OFFSET_Y + TILE_SIZE * 2  -- deja 2 tiles de margen superior
@@ -349,6 +414,26 @@ function Room:generateObjects()
     end
 end
 
+function Room:generateDoorways()
+    if self.isBossRoom then
+        -- Si es sala de jefe, solo generamos una puerta (la de entrada)
+        local oppositeDirection = {
+            ['left'] = 'right',
+            ['right'] = 'left',
+            ['top'] = 'down',
+            ['down'] = 'top'
+        }
+        local exitDirection = oppositeDirection[self.entranceDirection]
+        table.insert(self.doorways, Doorway(exitDirection, false, self))
+    else
+        -- Si es sala normal, generamos las cuatro puertas
+        table.insert(self.doorways, Doorway('top', false, self))
+        table.insert(self.doorways, Doorway('bottom', false, self))
+        table.insert(self.doorways, Doorway('left', false, self))
+        table.insert(self.doorways, Doorway('right', false, self))
+    end
+end
+
 function Room:render()
     for y = 1, self.height do
         for x = 1, self.width do
@@ -361,6 +446,7 @@ function Room:render()
 
     -- render doorways; stencils are placed where the arches are after so the player can
     -- move through them convincingly
+    
     for k, doorway in pairs(self.doorways) do
         doorway:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end

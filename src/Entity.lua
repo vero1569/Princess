@@ -34,12 +34,18 @@ function Entity:init(def)
     self.walkSpeed = def.walkSpeed
 
     self.health = def.health
+    self.isBoss = def.isBoss or false  -- Agregamos esta línea
 
     -- flags for flashing the entity when hit
     self.invulnerable = false
     self.invulnerableDuration = 0
     self.invulnerableTimer = 0
     self.flashTimer = 0
+
+       -- flags for boss sword immunity
+    self.swordImmune = self.isBoss
+    self.swordVulnerableTimer = 0
+    self.swordVulnerableDuration = 5
 
     self.dead = false
     
@@ -70,7 +76,19 @@ function Entity:collides(target)
 end
 
 function Entity:damage(dmg)
-    self.health = self.health - dmg
+
+    if self.isBoss and self.swordImmune then
+        -- Si es el jefe y es inmune a la espada, no recibe daño
+        return
+    end
+
+    if self.health > 1 then  -- Si es el jefe
+        -- El jefe recibe menos daño
+        self.health = self.health - 0.5
+    else
+        -- Enemigos normales reciben daño normal
+        self.health = self.health - dmg
+    end
 end
 
 function Entity:heal(life)
@@ -102,6 +120,15 @@ function Entity:update(dt)
             self.flashTimer = 0
         end
     end
+
+    if not self.swordImmune and self.isBoss then
+        self.swordVulnerableTimer = self.swordVulnerableTimer + dt
+        if self.swordVulnerableTimer >= self.swordVulnerableDuration then
+            self.swordImmune = true
+            self.swordVulnerableTimer = 0
+        end
+    end
+
 
     self.stateMachine:update(dt)
 

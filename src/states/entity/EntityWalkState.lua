@@ -11,18 +11,29 @@
 ]]
 EntityWalkState = Class{__includes = BaseState}
 
-function EntityWalkState:init(entity, dungeon)
+function EntityWalkState:init(entity, room)
     self.entity = entity
     self.entity:changeAnimation('walk-down')
 
-    self.dungeon = dungeon
-
+    --self.dungeon = dungeon
+    self.room = room
+    
     -- used for AI control
     self.moveDuration = 0
     self.movementTimer = 0
 
     -- keeps track of whether we just hit a wall
     self.bumped = false
+
+    
+    -- Tiempo entre disparos para el jefe
+    self.shootTimer = 0
+    self.shootInterval = 2  -- Dispara cada 2 segundos
+
+      -- Temporizador para el parpadeo de la barra de vida
+      self.healthBarBlinkTimer = 0
+      self.healthBarBlinkInterval = 0.2  -- Parpadea cada 0.2 segundos
+      self.healthBarVisible = true
 end
 
 function EntityWalkState:update(dt)
@@ -62,6 +73,55 @@ function EntityWalkState:update(dt)
             self.bumped = true
         end
     end
+    -- Si es el jefe, manejar el disparo
+    if self.entity.isBoss then
+        -- Actualizar el temporizador de disparo
+        self.shootTimer = self.shootTimer + dt
+        
+        -- Si es hora de disparar
+        if self.shootTimer >= self.shootInterval then
+            self.shootTimer = 0
+
+            local dx = self.room.player.x - self.entity.x
+            local dy = self.room.player.y - self.entity.y
+            
+            local direction
+            if math.abs(dx) > math.abs(dy) then
+                -- Movimiento más horizontal
+                direction = dx > 0 and 'right' or 'left'
+            else
+                -- Movimiento más vertical
+                direction = dy > 0 and 'down' or 'up'
+            end
+            -- Crear una bola de fuego
+            local fireball = GameObject(
+                GAME_OBJECT_DEFS['fire'],
+                self.entity.x,
+                self.entity.y
+            )
+            
+            -- Crear el proyectil y agregarlo a la sala
+            local projectile = Projectile(fireball, direction)
+            table.insert(self.room.projectiles, projectile)
+            
+            -- Reproducir sonido de disparo
+            SOUNDS['sword']:play()
+        end
+    end
+
+      -- Actualizar el parpadeo de la barra de vida
+    if self.entity.isBoss and not self.entity.swordImmune then
+        self.healthBarBlinkTimer = self.healthBarBlinkTimer + dt
+        if self.healthBarBlinkTimer >= self.healthBarBlinkInterval then
+            self.healthBarBlinkTimer = 0
+            self.healthBarVisible = not self.healthBarVisible
+        end
+    else
+        self.healthBarVisible = true
+    end
+
+
+
 end
 
 function EntityWalkState:processAI(params, dt)
@@ -98,4 +158,31 @@ function EntityWalkState:render()
     -- love.graphics.setColor(love.math.colorFromBytes(255, 0, 255, 255))
     -- love.graphics.rectangle('line', self.entity.x, self.entity.y, self.entity.width, self.entity.height)
     -- love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 255))
+
+    -- Solo mostrar la barra de vida si es el jefe
+
+    
+    if self.entity.isBoss then
+        -- Solo mostrar la barra de vida si es visible o si el jefe es inmune
+        if self.healthBarVisible or self.entity.swordImmune then
+            -- Fondo de la barra (rojo)
+            love.graphics.setColor(1, 0, 0, 1)
+            love.graphics.rectangle('fill', 
+                self.entity.x, 
+                self.entity.y - 10, 
+                self.entity.width, 
+                4)
+            
+            -- Barra de vida actual (verde)
+            love.graphics.setColor(0, 1, 0, 1)
+            love.graphics.rectangle('fill', 
+                self.entity.x, 
+                self.entity.y - 10, 
+                (self.entity.health / 20) * self.entity.width,
+                4)
+        end
+        
+        -- Restaurar color
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end

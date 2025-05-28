@@ -77,7 +77,7 @@ GAME_OBJECT_DEFS = {
             ['closed'] = { frame = 1 },
             ['open'] = { frame = 2 }
         }
-    },
+    },    
     ['bow'] = {
     type = 'bow',
     texture = 'bow',
@@ -94,6 +94,35 @@ GAME_OBJECT_DEFS = {
         player.bowFrame = object.frame
     end
 
-}
+    },
+
+    ['arrow'] = {
+    type = 'arrow',
+    texture = 'arrow',
+    frame = 1, -- Asumiendo que el frame 2 es la flecha
+    width = 8,
+    height = 23,
+    solid = false,
+    defaultState = 'default',
+    states = {
+        ['default'] = {
+            frame = 1
+        }
+    }
+    },
+
+    ['fire'] = {
+        type = 'fire',
+        texture = 'fire',
+        frame = 1,
+        width = 11,
+        height = 15,
+        solid = false,
+        defaultState = 'default',
+        states = {['default'] = {
+            frame = 1
+        }
+    }
+    }
 
 }

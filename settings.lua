@@ -39,6 +39,7 @@ require 'src/states/entity/player/PlayerPotWalkState'
 require 'src/states/game/GameOverState'
 require 'src/states/game/PlayState'
 require 'src/states/game/StartState'
+require 'src/states/game/WinnerState'
 
 require 'src/utilities/quads'
 
@@ -97,7 +98,10 @@ TEXTURES = {
     ['character-pot-lift'] = love.graphics.newImage('assets/textures/character_pot_lift.png'),
     ['character-pot-walk'] = love.graphics.newImage('assets/textures/character_pot_walk.png'),
     ['chest'] = love.graphics.newImage('assets/textures/chest2.png'),
-    ['bow'] = love.graphics.newImage('assets/textures/bow.png')
+    ['bow'] = love.graphics.newImage('assets/textures/bow.png'),
+    ['arrow'] = love.graphics.newImage('assets/textures/arrow.png'),
+    ['boss'] = love.graphics.newImage('assets/textures/Green-Cap-Character-16x18.png'),
+    ['fire'] = love.graphics.newImage('assets/textures/fire.png')
 }
 
 FRAMES = {
@@ -110,8 +114,10 @@ FRAMES = {
     ['character-pot-lift'] = generateQuads(TEXTURES['character-pot-lift'], 16, 32),
     ['character-pot-walk'] = generateQuads(TEXTURES['character-pot-walk'], 16, 32),
     ['chest'] = generateQuads(TEXTURES['chest'], 32, 32),
-    ['bow'] = generateQuads(TEXTURES['bow'], 16, 16)
-   
+    ['bow'] = generateQuads(TEXTURES['bow'], 16, 16),
+    ['arrow'] = generateQuads(TEXTURES['arrow'], 8, 23),
+    ['boss'] = generateQuads(TEXTURES['boss'], 16, 18),
+    ['fire'] = generateQuads(TEXTURES['fire'], 11, 15)
 }
 
 FONTS = {
