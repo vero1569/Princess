@@ -28,7 +28,7 @@ function EntityWalkState:init(entity, room)
     
     --tiempo entre disparos para el jefe
     self.shootTimer = 0
-    self.shootInterval = 2  --dispara cada 2 segundos
+    self.shootInterval = 5  --dispara cada 5 segundos
 
    
       self.healthBarBlinkTimer = 0
