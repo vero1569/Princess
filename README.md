@@ -1,51 +1,51 @@
 # The Legend of the Princess (ARPG)
 
-Este proyecto es un juego de acción y rol inspirado en clásicos del género, desarrollado en Love2D y Lua.
+This project is an action-RPG inspired by classics of the genre, developed in Love2D and Lua.
 
-## ¿Cómo jugar?
+## How to play
 
-- **Objetivo:** Explora las habitaciones, derrota enemigos y enfréntate al jefe final para ganar.
-- **Controles:**
-  - **Flechas del teclado:** Mover al personaje.
-  - **Espacio:** Atacar con la espada.
-  - **Enter:** Levantar y lanzar objetos (si están cerca).
-  - **Escape:** Salir del juego.
-  - **Z:** Disparar flechas tras obtener el arco del cofre.
+- **Objective:** Explore rooms, defeat enemies, and face the final boss to win.
+- **Controls:**
+- **Arrow keys:** Move your character.
+- **Space:** Attack with your sword.
+- **Enter:** Pick up and throw objects (if nearby).
+- **Escape:** Quit the game.
+- **Z:** Shoot arrows after obtaining the bow from the chest.
 
-## Mecánicas principales
+## Main Mechanics
 
-- **Exploración:** Muévete por diferentes habitaciones conectadas por puertas.
-- **Enemigos:** Cada habitación puede contener enemigos con diferentes patrones de movimiento y ataque.
-- **Jefe:** Aparece aleatoriamente en la sala final. Debes esquivar sus bolas de fuego y atacarlo con la espada, pero solo después de haberle disparado una flecha para debilitarlo.
-- **Objetos:** Puedes encontrar cofres, interruptores y otros objetos interactivos.
-- **Proyectiles:** El jefe dispara bolas de fuego cada cierto tiempo. Si te golpean, perderás vida. Atacar al jefe sin haberle disparado la flecha primero no tendrá efecto.
+- **Exploration:** Move through different rooms connected by doors.
+- **Enemies:** Each room may contain enemies with different movement and attack patterns.
+- **Boss:** Appears randomly in the final room. You must dodge its fireballs and attack it with your sword, but only after shooting it with an arrow to weaken it.
+- **Objects:** You can find chests, switches, and other interactive objects.
+- **Projectiles:** The boss shoots fireballs every so often. If they hit you, you will lose health. Attacking the boss without shooting it with an arrow first will have no effect.
 
-## Estructura del código
+## Code Structure
 
-- `src/world/Room.lua`: Lógica de las habitaciones, colisiones y objetos.
-- `src/states/entity/EntityWalkState.lua`: Lógica de movimiento y ataques del jefe y enemigos.
-- `src/states/entity/EntityIdleState.lua`: Estado de reposo de las entidades.
-- `src/definitions/entity.lua`: Definición de entidades y animaciones.
+- `src/world/Room.lua`: Room logic, collisions, and objects.
+- `src/states/entity/EntityWalkState.lua`: Boss and enemy movement and attack logic.
+- `src/states/entity/EntityIdleState.lua`: Entity idle state.
+- `src/definitions/entity.lua`: Entity definitions and animations.
 
-## Requisitos
+## Requirements
 
-- [Love2D](https://love2d.org/) 11.3 o superior.
+- [Love2D](https://love2d.org/) 11.3 or higher.
 
-## Cómo ejecutar
+## How to Run
 
-1. Descarga o clona este repositorio.
-2. Abre una terminal en la carpeta del proyecto.
-3. Ejecuta el juego con:
-   ```
-   love .
-   ```
+1. Download or clone this repository.
+2. Open a terminal in the project folder.
+3. Run the game with:
+```
+love .
+```
 
-## Créditos
+## Credits
 
-- Colton Ogden (autor original)
-- Alejandro Mujica (modificaciones educativas)
-- Adaptado y extendido por Ana Veronica Jaimes, Eduardo Rodriguez y Davod Rondon 
+- Colton Ogden (original author)
+- Alejandro Mujica (educational modifications)
+- Adapted and extended by Ana Veronica Jaimes, Eduardo Rodriguez, and Davod Rondon
 
 ---
 
-¡Diviértete jugando y aprendiendo con The Legend of the Princess!
+Have fun playing and learning with The Legend of the Princess!
