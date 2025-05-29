@@ -30,11 +30,11 @@ function PlayerIdleState:update(dt)
             self.entity.x,
             self.entity.y
         )
-        -- Crear el proyectil y agregarlo a la sala
+        --Crea el proyectil
         local projectile = Projectile(arrow, self.entity.direction)
         table.insert(self.dungeon.currentRoom.projectiles, projectile)
         
-        -- Reproducir sonido
+       
         SOUNDS['sword']:play()
     end
 

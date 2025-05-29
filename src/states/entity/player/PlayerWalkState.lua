@@ -38,18 +38,18 @@ function PlayerWalkState:update(dt)
     end
 
     
- -- Nuevo código para disparar flechas
+ --codigo para disparar flechas
     if love.keyboard.wasPressed('z') and self.entity.hasBow then
         local arrow = GameObject(
             GAME_OBJECT_DEFS['arrow'],
             self.entity.x,
             self.entity.y
         )
-        -- Crear el proyectil y agregarlo a la sala
+     
         local projectile = Projectile(arrow, self.entity.direction)
         table.insert(self.dungeon.currentRoom.projectiles, projectile)
         
-        -- Reproducir sonido
+
         SOUNDS['sword']:play()
     end
     if love.keyboard.wasPressed('space') then

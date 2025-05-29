@@ -78,15 +78,15 @@ end
 function Entity:damage(dmg)
 
     if self.isBoss and self.swordImmune then
-        -- Si es el jefe y es inmune a la espada, no recibe daño
+        -- si es el jefe y es inmune a la espada no recibe daño
         return
     end
 
     if self.health > 1 then  -- Si es el jefe
-        -- El jefe recibe menos daño
+        -- sl jefe recibe menos daño
         self.health = self.health - 0.5
     else
-        -- Enemigos normales reciben daño normal
+        --enemigos normales reciben daño normal
         self.health = self.health - dmg
     end
 end

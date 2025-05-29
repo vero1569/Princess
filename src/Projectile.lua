@@ -73,17 +73,17 @@ end
 function Projectile:render()
     --self.obj:render(0, 0)
 
-      -- Guardamos el estado actual de la transformación
+      -- guardamos el estado actual de la transformación
       love.graphics.push()
     
-      -- Calculamos el centro de la flecha para la rotación
+      -- se calcula el centro de la flecha para rotarla
       local centerX = self.obj.x + self.obj.width/2
       local centerY = self.obj.y + self.obj.height/2
       
-      -- Movemos al centro de la flecha
+      -- se centra la flecha
       love.graphics.translate(centerX, centerY)
       
-      -- Rotamos según la dirección
+      -- rotaciones de la flecha
       if self.direction == 'up' then
           love.graphics.rotate(-math.pi) -- -90 grados
       elseif self.direction == 'left' then
@@ -91,17 +91,17 @@ function Projectile:render()
       elseif self.direction == 'right' then
           love.graphics.rotate(-math.pi/2) -- 180 grados
       end
-      -- 'right' no necesita rotación (0 grados)
+      -- right no necesita rotacion el sprite esta en ese angulo por defecto
       
-      -- Dibujamos la flecha centrada
+      -- dibujamos la flecha centrada
       love.graphics.draw(
           TEXTURES[self.obj.texture],
           FRAMES[self.obj.texture][self.obj.states[self.obj.state].frame or self.obj.frame],
-          -self.obj.width/2, -- Centramos horizontalmente
-          -self.obj.height/2 -- Centramos verticalmente
+          -self.obj.width/2, 
+          -self.obj.height/2 
       )
       
-      -- Restauramos el estado de la transformación
+      
       love.graphics.pop()
 end
 

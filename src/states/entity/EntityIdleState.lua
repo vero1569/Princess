@@ -43,7 +43,7 @@ function EntityIdleState:render()
     -- love.graphics.rectangle('line', self.entity.x, self.entity.y, self.entity.width, self.entity.height)
     -- love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 255))
     if self.entity.isBoss then
-        -- Fondo de la barra (rojo)
+        --barra roja
         love.graphics.setColor(1, 0, 0, 1)
         love.graphics.rectangle('fill', 
             self.entity.x, 
@@ -51,7 +51,7 @@ function EntityIdleState:render()
             self.entity.width, 
             4)
         
-        -- Barra de vida actual (verde)
+        --barra verde, vida
         love.graphics.setColor(0, 1, 0, 1)
         love.graphics.rectangle('fill', 
             self.entity.x, 
@@ -59,7 +59,7 @@ function EntityIdleState:render()
             (self.entity.health / 20) * self.entity.width,
             4)
         
-        -- Restaurar color
+       
         love.graphics.setColor(1, 1, 1, 1)
     end
 end

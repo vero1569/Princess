@@ -36,7 +36,7 @@ function Player:render()
         math.floor(self.y - self.offsetY)
     )
 
-    --dibuja el mas arriba del jugador
+    --dibuja el arco mas arriba del jugador
     if self.hasBow and self.bowFrame then
         love.graphics.draw(
             TEXTURES['bow'],

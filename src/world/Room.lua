@@ -206,9 +206,9 @@ function Room:update(dt)
     for k, projectile in pairs(self.projectiles) do
         projectile:update(dt)
     
-        -- Si el proyectil es una bola de fuego del jefe
+        -- si el proyectil es una bola de fuego del jefe
         if projectile.obj.type == 'fire' then
-            -- Solo colisiona con el jugador
+            -- solo colisiona con el jugador
             if not projectile.dead and projectile:collides(self.player) then
                 self.player:damage(6)
                 SOUNDS['hit-player']:play()
@@ -217,7 +217,7 @@ function Room:update(dt)
                 stateMachine:change('game-over')
             end
         else
-           -- Para otros proyectiles (flechas), colisionan con entidades
+           -- flechas que colisionan con entidades
             for e, entity in pairs(self.entities) do
                 if projectile.dead then
                     break
@@ -225,7 +225,7 @@ function Room:update(dt)
 
                 if not entity.dead and projectile:collides(entity) then
                     if entity.isBoss then
-                        -- Si es el jefe, hacerlo vulnerable a la espada
+                        -- si es el jefe hacerlo vulnerable a la espada
                         entity.swordImmune = false
                         entity.swordVulnerableTimer = 0
                     end
@@ -288,15 +288,15 @@ end
 function Room:generateEntities()
     local types = {'skeleton', 'slime', 'bat', 'ghost', 'spider'}
     if self.isBossRoom then
-         -- Generar el jefe en el centro de la sala
+         -- generar el jefe en el centro de la sala
          table.insert(self.entities, Entity {
             animations = ENTITY_DEFS['boss'].animations,
             walkSpeed = ENTITY_DEFS['boss'].walkSpeed,
-            x = VIRTUAL_WIDTH / 2 - 16,  -- Centrado horizontalmente
-            y = VIRTUAL_HEIGHT / 2 - 16,  -- Centrado verticalmente
-            width = 32,  -- Jefe más grande
+            x = VIRTUAL_WIDTH / 2 - 16, 
+            y = VIRTUAL_HEIGHT / 2 - 16,  
+            width = 32,  -- Jefe mas grande
             height = 32,
-            health = 20, -- Más vida que enemigos normales
+            health = 20, --Mas vida que enemigos normales
             isBoss = true
         })
 
@@ -393,7 +393,7 @@ function Room:generateObjects()
             if math.random(20) == 1 then
                 local potX = x * 16
                 local potY = y * 16
-                -- Verifica que no se superponga con el cofre
+                -- verifica que no se superponga con el cofre
                 local overlap = false
                 for _, obj in pairs(self.objects) do
                     if obj.type == 'chest' then
@@ -416,7 +416,7 @@ end
 
 function Room:generateDoorways()
     if self.isBossRoom then
-        -- Si es sala de jefe, solo generamos una puerta (la de entrada)
+        -- si es sala de jefe solo se genera una puerta que es por donde entra el jugador
         local oppositeDirection = {
             ['left'] = 'right',
             ['right'] = 'left',
@@ -426,7 +426,7 @@ function Room:generateDoorways()
         local exitDirection = oppositeDirection[self.entranceDirection]
         table.insert(self.doorways, Doorway(exitDirection, false, self))
     else
-        -- Si es sala normal, generamos las cuatro puertas
+        -- en la las salas normal se generan las 4 puertas
         table.insert(self.doorways, Doorway('top', false, self))
         table.insert(self.doorways, Doorway('bottom', false, self))
         table.insert(self.doorways, Doorway('left', false, self))
